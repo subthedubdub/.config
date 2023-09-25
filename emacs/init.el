@@ -56,7 +56,10 @@
     "wd" 'delete-window  ; delete window
     "wq" 'kill-buffer-and-window  ; kill the current buffer and window
     "wo" 'delete-other-windows  ; delete other windows
-
+    "wl" 'evil-window-right
+    "wh" 'evil-window-left
+    "wj" 'evil-window-down
+    "wk" 'evil-window-up
     ;; Vterm
     "vt" 'vterm
     ))
@@ -121,7 +124,9 @@
 (use-package eglot-jl
   :after eglot julia-mode)
 (use-package julia-snail
-  :after vterm julia-mode)
+  :after vterm julia-mode
+  :hook (julia-mode . julia-snail-mode))
+
 
 ;; Enable company for auto-completion
 (use-package company
