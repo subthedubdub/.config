@@ -4,7 +4,6 @@
 (setq user-full-name "Michael Tomas Kovarik"
       user-mail-address "michaelkovarik@protonmail.com")
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 01 Package Management
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -114,29 +113,60 @@
 ;; vterm
 (use-package vterm)
 
-;; Enable eglot for language server support
-(use-package eglot
-  :commands eglot)
+;; projectile
+(use-package projectile)
+
+;; lsp / dap
+(use-package lsp-mode
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :hook ((lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+(use-package lsp-ui
+  :ensure
+  :commands lsp-ui-mode
+  :custom
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-doc-enable nil))
+(use-package dap-mode)
+(use-package exec-path-from-shell
+  :ensure
+  :init (exec-path-from-shell-initialize))
+
+(use-package dap-mode
+  :ensure
+  :config
+  (dap-ui-mode)
+  (dap-ui-controls-mode 1)
+
+  (require 'dap-lldb)
+  ;; installs .extension/vscode
+  (dap-register-debug-template
+   "Rust::LLDB Run Configuration"
+   (list :type "lldb"
+         :request "launch"
+         :name "LLDB::Run"
+	 :gdbpath "rust-lldb"
+         :target nil
+         :cwd nil)))
+
+
+;; Rust
+(use-package rustic)
+
+;; Java
+(use-package lsp-java :config (add-hook 'java-mode-hook 'lsp))
+(use-package dap-java :ensure nil)
 
 ;; Julia
 (use-package julia-mode
   :mode "\\.jl\\'")
-(use-package eglot-jl
-  :after eglot julia-mode)
+(use-package lsp-julia :config (add-hook 'julia-mode-hook 'lsp))
 (use-package julia-snail
   :after vterm julia-mode
   :hook (julia-mode . julia-snail-mode))
-
-;; Java
-(use-package lsp-java
-  :after eglot
-  :config
-  (add-hook 'java-mode-hook 'eglot-ensure))
-
-;; Rust
-(use-package rust-mode
-  :mode "\\.rs\\'"
-  :hook (rust-mode . eglot-ensure))
 
 
 ;; Enable company for auto-completion
@@ -158,6 +188,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 05 UI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package helm)
+
 (use-package org-modern
   :config
   (add-hook 'org-mode-hook #'org-modern-mode)
@@ -165,6 +197,9 @@
 (use-package gruvbox-theme
   :config
   (load-theme 'gruvbox t))
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
 (set-frame-font "JuliaMono 16" nil t)
 (menu-bar-mode 0)
 (tool-bar-mode 0)
