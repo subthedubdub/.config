@@ -21,6 +21,25 @@
 
 (setq use-package-always-ensure t)
 
+;; straight
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+
+;; Use straight.el with use-package
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 02 Keyboard and Mouse
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -130,43 +149,25 @@
   (lsp-ui-peek-always-show t)
   (lsp-ui-sideline-show-hover t)
   (lsp-ui-doc-enable nil))
-(use-package dap-mode)
 (use-package exec-path-from-shell
-  :ensure
   :init (exec-path-from-shell-initialize))
 
 (use-package dap-mode
-  :ensure
   :config
   (dap-ui-mode)
-  (dap-ui-controls-mode 1)
+  (dap-ui-controls-mode 1))
 
-  (require 'dap-lldb)
-  ;; installs .extension/vscode
-  (dap-register-debug-template
-   "Rust::LLDB Run Configuration"
-   (list :type "lldb"
-         :request "launch"
-         :name "LLDB::Run"
-	 :gdbpath "rust-lldb"
-         :target nil
-         :cwd nil)))
-
-
-;; Rust
-(use-package rustic)
-
-;; Java
-(use-package lsp-java :config (add-hook 'java-mode-hook 'lsp))
-(use-package dap-java :ensure nil)
 
 ;; Julia
+;; dap-julia not released until dap-mode 0.9
 (use-package julia-mode
   :mode "\\.jl\\'")
 (use-package lsp-julia :config (add-hook 'julia-mode-hook 'lsp))
 (use-package julia-snail
   :after vterm julia-mode
   :hook (julia-mode . julia-snail-mode))
+(use-package dap-julia
+  :straight (:host github :repo "emacs-lsp/dap-mode"))
 
 
 ;; Enable company for auto-completion
@@ -204,6 +205,7 @@
 (menu-bar-mode 0)
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
+(column-number-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 06 Custom Variables & Faces
