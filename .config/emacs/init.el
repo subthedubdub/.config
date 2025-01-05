@@ -14,7 +14,7 @@
         ("gnu-devel" . "https://elpa.gnu.org/devel/")
         ("nongnu" . "https://elpa.nongnu.org/nongnu/")
         ("melpa" . "https://melpa.org/packages/")))
-
+1
 (eval-when-compile
   (add-to-list 'load-path "~/.config/emacs/use-package")
   (require 'use-package))
@@ -79,7 +79,7 @@
     "wj" 'evil-window-down
     "wk" 'evil-window-up
     ;; Vterm
-    "vt" 'vterm
+    "tm" 'eat
     ))
 
 
@@ -129,8 +129,8 @@
 ;; 04 Coding
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; vterm
-(use-package vterm)
+;; eat
+(use-package eat)
 
 ;; projectile
 (use-package projectile)
@@ -191,21 +191,63 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package helm)
 
+;; NANO
+(straight-use-package
+ '(nano-theme :type git :host github
+               :repo "rougier/nano-theme"))
+(straight-use-package
+ '(nano-agenda :type git :host github
+	       :repo "rougier/nano-agenda"))
+(straight-use-package
+ '(nano-read :type git :host github
+	       :repo "rougier/nano-read"))
+(straight-use-package
+ '(nano-modeline :type git :host github
+		 :repo "rougier/nano-modeline"
+		 :branch "rewrite"))
+(straight-use-package
+ '(nano-box :type git :host github
+		 :repo "rougier/nano-tools"))
+(load-theme 'nano t)
+(require 'nano-modeline)
+(setq nano-modeline-position #'nano-modeline-footer)
+(add-hook 'prog-mode-hook            #'nano-modeline-prog-mode)
+(add-hook 'text-mode-hook            #'nano-modeline-text-mode)
+(add-hook 'org-mode-hook             #'nano-modeline-org-mode)
+(add-hook 'pdf-view-mode-hook        #'nano-modeline-pdf-mode)
+(add-hook 'mu4e-headers-mode-hook    #'nano-modeline-mu4e-headers-mode)
+(add-hook 'mu4e-view-mode-hook       #'nano-modeline-mu4e-message-mode)
+(add-hook 'elfeed-show-mode-hook     #'nano-modeline-elfeed-entry-mode)
+(add-hook 'elfeed-search-mode-hook   #'nano-modeline-elfeed-search-mode)
+(add-hook 'term-mode-hook            #'nano-modeline-term-mode)
+(add-hook 'xwidget-webkit-mode-hook  #'nano-modeline-xwidget-mode)
+(add-hook 'messages-buffer-mode-hook #'nano-modeline-message-mode)
+(add-hook 'org-capture-mode-hook     #'nano-modeline-org-capture-mode)
+(add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode)
+
+
 (use-package org-modern
   :config
   (add-hook 'org-mode-hook #'org-modern-mode)
   (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
-(use-package gruvbox-theme
-  :config
-  (load-theme 'gruvbox t))
-(use-package doom-modeline
-  :ensure t
-  :init (doom-modeline-mode 1))
+
+
+
+(setq-default select-enable-clipboard t) ; Merge system's and Emacs' clipboard
+
 (set-frame-font "JuliaMono 16" nil t)
+
 (menu-bar-mode 0)
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
 (column-number-mode t)
+(setq inhibit-startup-screen t)
+(blink-cursor-mode 0)
+(setq-default cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
+              cursor-type '(hbar . 2)            ; Underline-shaped cursor
+              cursor-intangible-mode t           ; Enforce cursor intangibility
+              x-stretch-cursor nil)              ; Don't stretch cursor to the glyph width
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 06 Custom Variables & Faces
