@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 00 General
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq user-full-name "Michael Tomas Kovarik"
@@ -12,9 +12,8 @@
 (setq package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")
         ("gnu-devel" . "https://elpa.gnu.org/devel/")
-        ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+        ("Nongnu" . "https://elpa.nongnu.org/nongnu/")
         ("melpa" . "https://melpa.org/packages/")))
-1
 (eval-when-compile
   (add-to-list 'load-path "~/.config/emacs/use-package")
   (require 'use-package))
@@ -60,7 +59,7 @@
     "fs" 'save-buffer  ; save file
     "fw" 'write-file  ; write file
     "fr" 'recentf-open-files  ; open recent file
-    "fd" 'dired  ; open directory browser
+    "fd" 'dired  ; open directory browser.
     "ft"  'treemacs ; toggle treemacs
 
     ;; Buffer operations
@@ -191,45 +190,26 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package helm)
 
-;; NANO
-(straight-use-package
- '(nano-theme :type git :host github
-               :repo "rougier/nano-theme"))
+;; Theming
+(use-package gruvbox-theme
+  :config
+  (load-theme 'gruvbox-light-soft t))
 (straight-use-package
  '(nano-agenda :type git :host github
 	       :repo "rougier/nano-agenda"))
-(straight-use-package
- '(nano-read :type git :host github
-	       :repo "rougier/nano-read"))
-(straight-use-package
- '(nano-modeline :type git :host github
-		 :repo "rougier/nano-modeline"
-		 :branch "rewrite"))
-(straight-use-package
- '(nano-box :type git :host github
-		 :repo "rougier/nano-tools"))
-(load-theme 'nano t)
-(require 'nano-modeline)
-(setq nano-modeline-position #'nano-modeline-footer)
-(add-hook 'prog-mode-hook            #'nano-modeline-prog-mode)
-(add-hook 'text-mode-hook            #'nano-modeline-text-mode)
-(add-hook 'org-mode-hook             #'nano-modeline-org-mode)
-(add-hook 'pdf-view-mode-hook        #'nano-modeline-pdf-mode)
-(add-hook 'mu4e-headers-mode-hook    #'nano-modeline-mu4e-headers-mode)
-(add-hook 'mu4e-view-mode-hook       #'nano-modeline-mu4e-message-mode)
-(add-hook 'elfeed-show-mode-hook     #'nano-modeline-elfeed-entry-mode)
-(add-hook 'elfeed-search-mode-hook   #'nano-modeline-elfeed-search-mode)
-(add-hook 'term-mode-hook            #'nano-modeline-term-mode)
-(add-hook 'xwidget-webkit-mode-hook  #'nano-modeline-xwidget-mode)
-(add-hook 'messages-buffer-mode-hook #'nano-modeline-message-mode)
-(add-hook 'org-capture-mode-hook     #'nano-modeline-org-capture-mode)
-(add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode)
+(modify-all-frames-parameters
+ '((right-dvidider-width . 30)
+   (left-fringe . 30)
+   (right-fringe . 30)))
 
 
 (use-package org-modern
   :config
   (add-hook 'org-mode-hook #'org-modern-mode)
   (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
+(use-package doom-modeline
+  :config
+  (add-hook 'after-init-hook #'doom-modeline-mode))
 
 
 
@@ -243,10 +223,6 @@
 (column-number-mode t)
 (setq inhibit-startup-screen t)
 (blink-cursor-mode 0)
-(setq-default cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
-              cursor-type '(hbar . 2)            ; Underline-shaped cursor
-              cursor-intangible-mode t           ; Enforce cursor intangibility
-              x-stretch-cursor nil)              ; Don't stretch cursor to the glyph width
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -255,4 +231,11 @@
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file 'noerror)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 07 Miscellany
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; AI
+(use-package gptel
+  :config
+  (setq gptel-api-key (getenv "OPENAI_API_KEY")))
