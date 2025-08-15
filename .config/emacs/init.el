@@ -77,7 +77,7 @@
     "wh" 'evil-window-left
     "wj" 'evil-window-down
     "wk" 'evil-window-up
-    ;; Vterm
+    ;; Terminal
     "tm" 'eat
     ))
 
@@ -131,26 +131,18 @@
 ;; eat
 (use-package eat)
 
-;; projectile
-(use-package projectile)
+;; eglot
+(use-package eglot
+  :hook ((python-mode . eglot-ensure)
+	 (java-mode . eglot-ensure)
+	 (julia-mode . eglot-ensure)
+         (after-save . eglot-format))
+  :config
+  (setq eglot-report-progress nil)
+  (add-to-list 'eglot-server-programs
+               '(python-mode . ("ruff" "server"))))
 
-;; lsp / dap
-(use-package lsp-mode
-  :init
-  (setq lsp-keymap-prefix "C-c l")
-  :hook ((lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp)
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-(use-package lsp-ui
-  :ensure
-  :commands lsp-ui-mode
-  :custom
-  (lsp-ui-peek-always-show t)
-  (lsp-ui-sideline-show-hover t)
-  (lsp-ui-doc-enable nil))
-(use-package exec-path-from-shell
-  :init (exec-path-from-shell-initialize))
-
+;; dap
 (use-package dap-mode
   :config
   (dap-ui-mode)
@@ -165,9 +157,13 @@
 (use-package julia-snail
   :after vterm julia-mode
   :hook (julia-mode . julia-snail-mode))
-(use-package dap-julia
-  :straight (:host github :repo "emacs-lsp/dap-mode"))
 
+(use-package eglot
+  :hook ((python-mode . eglot-ensure)
+         (after-save . eglot-format))
+  :config
+  (add-to-list 'eglot-server-programs
+               '(python-mode . ("ruff" "server"))))
 
 ;; Enable company for auto-completion
 (use-package company
@@ -180,15 +176,18 @@
   (global-flycheck-mode))
 
 ;; Enable magit for Git integration
-(use-package magit
-  :bind (("C-x g" . magit-status)))
+(use-package magit)
 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 05 UI
+;; MUST have JuliaMono font installed
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package helm)
+
+;; beep boop
+(setq visible-bell 1)
 
 ;; Theming
 (use-package gruvbox-theme
@@ -202,7 +201,7 @@
    (left-fringe . 30)
    (right-fringe . 30)))
 
-
+(use-package nerd-icons)
 (use-package org-modern
   :config
   (add-hook 'org-mode-hook #'org-modern-mode)
@@ -211,6 +210,9 @@
   :config
   (add-hook 'after-init-hook #'doom-modeline-mode))
 
+;; Eldoc enhancements
+(use-package eldoc-box
+  :hook (eldoc-mode . eldoc-box-hover-at-point-mode))
 
 
 (setq-default select-enable-clipboard t) ; Merge system's and Emacs' clipboard
@@ -230,12 +232,3 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file 'noerror)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 07 Miscellany
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; AI
-(use-package gptel
-  :config
-  (setq gptel-api-key (getenv "OPENAI_API_KEY")))
